@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:remote": "wrangler dev src/index.ts --remote",
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:generate": "kysely-codegen",
+    "migration:create": "wrangler d1 migrations create dev-photo-sharing",
+    "migration:apply": "wrangler d1 migrations apply dev-photo-sharing",
+    "migration:deploy": "wrangler d1 migrations apply dev-photo-sharing --remote",
+    "prepare": "cd .. && husky backend/.husky",
+    "schema:generate": "node ./scripts/generate-openapi.mjs"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^1.1.0",
+    "better-sqlite3": "^7.6.2",
+    "hono": "^4.9.2",
+    "kysely": "^0.28.5",
+    "kysely-d1": "^0.4.0"
+  },
+  "devDependencies": {
+    "kysely-codegen": "^0.18.5",
+    "wrangler": "^4.31.0"
+  }
+}

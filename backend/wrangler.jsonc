@@ -1,0 +1,55 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+/**
+ * Cloudflare Workers 설정 파일 (Wrangler 3.x 기준)
+ * 자세한 문서는 https://developers.cloudflare.com/workers/wrangler/configuration/ 참고
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // 프로젝트 이름
+  "name": "backend",
+
+  // 엔트리포인트 (Hono 서버)
+  "main": "src/index.ts",
+
+  // 호환성 날짜 (Workers runtime 버전 기준)
+  "compatibility_date": "2025-08-19",
+
+  // 정적 파일 제공 (public 폴더 사용 시)
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public"
+  },
+
+  // 📌 R2 버킷 바인딩
+  "r2_buckets": [
+    {
+      "binding": "OBJECT_STORAGE", // 코드에서 c.env.OBJECT_STORAGE 으로 접근
+      "bucket_name": "dev-photo-sharing", // Cloudflare 대시보드에서 만든 버킷 이름
+      "preview_bucket_name": "dev-photo-sharing"
+    }
+  ],
+
+  // 📌 D1 데이터베이스 바인딩
+  "d1_databases": [
+    {
+      "binding": "DB", // 코드에서 c.env.DB 로 접근
+      "database_name": "dev-photo-sharing", // Cloudflare 대시보드에서 만든 DB 이름
+      "database_id": "bbd750d1-3ce0-44b0-b0b8-1e4c097054bc"
+    }
+  ],
+
+  // 📌 환경 변수 (민감하지 않은 값만 넣기)
+  "vars": {
+    "ACCOUNT_ID": "ac194df9613976b4e3cfb4ca4b9fd173",
+    "BUCKET_NAME": "photo-app-bucket"
+  },
+
+  // 📌 Observability (Cloudflare Analytics)
+  "observability": {
+    "enabled": true
+  }
+}
