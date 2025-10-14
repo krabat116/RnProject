@@ -16,6 +16,7 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^1.1.0",
+    "aws4fetch": "^1.0.20",
     "better-sqlite3": "^7.6.2",
     "hono": "^4.9.2",
     "kysely": "^0.28.5",
