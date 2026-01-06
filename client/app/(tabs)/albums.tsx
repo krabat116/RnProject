@@ -7,7 +7,10 @@ import {
   TouchableHighlight,
   StyleSheet,
   TextInput,
+  Alert,
+  Pressable,
 } from 'react-native'
+
 import React, {
   FC,
   useCallback,
@@ -20,7 +23,8 @@ import { useFonts, Italiana_400Regular } from '@expo-google-fonts/italiana'
 import { Ionicons } from '@expo/vector-icons'
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+
+import { useFocusEffect } from '@react-navigation/native'
 
 // 👉 Cloudflare API Client
 import { api } from '@/external/fetch'
@@ -29,6 +33,8 @@ import Button, { DestructiveButton } from '../../components/CustomButton'
 
 // 👉 필요한 경우 User Session에서 userId 가져오기
 import { useUserSession } from '../../components/contexts/sessionContext'
+import { useRouter } from 'expo-router'
+
 type ImageItem = {
   id: string
   thumbnailUrl?: string
@@ -104,34 +110,6 @@ export default function Albums() {
         return
       }
 
-      // 2) 각 albumId에 대해 상세 정보 가져오기
-      // const albumDetails = await Promise.all(
-      //   albumIds.map(async (id) => {
-      //     const { data: albumData, error: albumError } = await api.GET(
-      //       '/album/{albumId}',
-      //       {
-      //         params: { path: { albumId: id } },
-      //       }
-      //     )
-
-      //     if (albumError) {
-      //       console.error(`Failed to fetch album ${id}:`, albumError)
-      //       return null
-      //     }
-
-      //     const album = albumData?.album
-      //     if (!album) return null
-
-      //     return {
-      //       id: album.id,
-      //       name: album.name,
-      //       description: album.description,
-      //       numImages: album.numImages,
-      //       thumbnailUrl: album.thumbnailUrl || undefined,
-      //     } as Album
-      //   })
-      // )
-
       const fetchImages = async (albumId: string, limit = 4) => {
         try {
           const { data, error } = await api.GET('/image/all/{albumId}', {
@@ -141,7 +119,11 @@ export default function Albums() {
             console.error('Error fetching images:', error)
             return []
           }
-          const arr = Array.isArray(data) ? data : data?.images ?? []
+          const arr = Array.isArray(data)
+            ? data
+            : data && typeof data === 'object' && 'images' in data
+            ? (data as any).images
+            : []
           return arr.slice(0, limit).map((image: any) => ({
             id: image.id,
             url: image.thumbnailUrl || image.imageUrl,
@@ -200,7 +182,7 @@ export default function Albums() {
         },
       })
       if (error) {
-        console.error('Failed to create album:', error)
+        console.error('Failed to create album:', JSON.stringify(error, null, 2))
         return
       }
       // 새로고침
@@ -229,6 +211,12 @@ export default function Albums() {
   useEffect(() => {
     fetchAlbums()
   }, [userId])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAlbums()
+    }, [userId])
+  )
 
   const CreateAlbumForm = () => {
     const [newAlbumName, setNewAlbumName] = useState('')
@@ -280,72 +268,81 @@ export default function Albums() {
       </View>
     )
   }
-
   const AlbumComponent: FC<{ album: Album }> = ({ album }) => {
-    const callback = () => {
-      setSelectedAlbum(album)
-      createAlbumOptionsModal()
-    }
-    const gesture = Gesture.LongPress().onStart(callback)
-
-    // 그리드에 쓸 4장 추려오기
+    const router = useRouter()
     const gridImages = (album.images ?? []).slice(0, 4)
     const placeholder = 'https://via.placeholder.com/300?text=Album'
 
-    return (
-      <GestureDetector gesture={gesture}>
-        <View className="mb-6 w-1/2">
-          <TouchableOpacity>
-            <View className="w-full aspect-square p-2">
-              <View className="w-full h-full overflow-hidden rounded-md bg-gray-100">
-                {gridImages.length > 0 ? (
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      flexWrap: 'wrap',
-                      justifyContent: 'space-between',
-                      alignContent: 'space-between',
-                      padding: 1,
-                    }}
-                  >
-                    {gridImages.map((img, idx) => (
-                      <Image
-                        key={img.id ?? idx}
-                        source={{ uri: img?.url ?? placeholder }}
-                        // 2×2 그리드: 각 타일 50% × 50%
-                        style={{ width: '49%', height: '49%' }}
-                        resizeMode="cover"
-                        onLoadStart={() =>
-                          console.log('[IMG] start', album.id, img?.url)
-                        }
-                        onLoad={() => console.log('[IMG] loaded', album.id)}
-                      />
-                    ))}
-                  </View>
-                ) : (
-                  <Image
-                    className="w-full h-full"
-                    source={{ uri: album.thumbnailUrl || placeholder }}
-                    resizeMode="cover"
-                    onLoadStart={() =>
-                      console.log('[IMG] start', album.id, album.thumbnailUrl)
-                    }
-                    onLoad={() => console.log('[IMG] loaded', album.id)}
-                  />
-                )}
-              </View>
-            </View>
+    const onLongPress = () => {
+      Alert.alert(
+        'Delete album?',
+        `"${album.name}" will be deleted.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              await deleteAlbum(album.id)
+            },
+          },
+        ],
+        { cancelable: true }
+      )
+    }
 
-            <Text className="text-left text-xl flex-wrap font-thin ml-2 mt-1">
-              {album.name}
-            </Text>
-            <Text className="text-xs text-gray-400 ml-2">
-              {(album.numImages ?? album.images?.length ?? 0) + ' photos'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </GestureDetector>
+    return (
+      <View className="mb-6 w-1/2">
+        <Pressable
+          onPress={() => {
+            router.push({
+              pathname: '/(routes)/albums/[albumId]',
+              params: { albumId: album.id, name: album.name },
+            })
+          }}
+          onLongPress={onLongPress}
+          delayLongPress={600}
+        >
+          <View className="w-full aspect-square p-2">
+            <View className="w-full h-full overflow-hidden rounded-md bg-gray-100">
+              {gridImages.length > 0 ? (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    alignContent: 'space-between',
+                    padding: 1,
+                  }}
+                >
+                  {gridImages.map((img, idx) => (
+                    <Image
+                      key={img.id ?? idx}
+                      source={{ uri: img?.url ?? placeholder }}
+                      style={{ width: '49%', height: '49%' }}
+                      resizeMode="cover"
+                    />
+                  ))}
+                </View>
+              ) : (
+                <Image
+                  className="w-full h-full"
+                  source={{ uri: album.thumbnailUrl || placeholder }}
+                  resizeMode="cover"
+                />
+              )}
+            </View>
+          </View>
+
+          <Text className="text-left text-xl font-thin ml-2 mt-1">
+            {album.name}
+          </Text>
+          <Text className="text-xs text-gray-400 ml-2">
+            {(album.numImages ?? album.images?.length ?? 0) + ' photos'}
+          </Text>
+        </Pressable>
+      </View>
     )
   }
 

@@ -4,69 +4,1834 @@
  */
 
 export interface paths {
-    "/album/all/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Id of user you wish to fetch albums for. */
-                    userId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Fetch all albums for a user. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            type: string;
-                            message: string;
-                            albumIds: string[];
-                        };
-                    };
-                };
-                /** @description albums could not be fetched. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            type: string;
-                            message: string;
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+  '/image': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ImageCreate']
+        }
+      }
+      responses: {
+        /** @description upload a new image object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to save new image. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/image/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch an image object. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              presignedUrl: string
+            }
+          }
+        }
+        /** @description Image could not be found in bucket. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete an existing image by id. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to delete the image. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ImageUpdate']
+        }
+      }
+      responses: {
+        /** @description update an image object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to update image. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/image/all/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch all image objects for an album. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              description: string | null
+              id: string
+              albumid: string
+              createdAt: string | null
+              heightpx: number
+              imageUrl: string
+              order: number
+              owner: string
+              thumbnailUrl: string
+              widthpx: number
+            }[]
+          }
+        }
+        /** @description Image could not be found in bucket. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/comment': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['CommentCreate']
+        }
+      }
+      responses: {
+        /** @description add a new comment to an album. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to add new comment. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/comment/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description add a new comment to an album. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              comments: {
+                content: string
+                albumid: string
+                dateAdded: string
+                dateCreated: string
+                id: string
+                owner: string
+                firstName: string
+                lastName: string
+                profileImage: string | null
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/comment/{commentId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          commentId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['CommentDelete']
+        }
+      }
+      responses: {
+        /** @description Delete a comment from a post. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description Failed to delete a comment from a post. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/groupmember/{groupId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description get group members. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              dateAdded: string
+              GroupId: string
+              Role: string
+              userId: string
+            }[]
+          }
+        }
+      }
+    }
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['GroupMemberCreate']
+        }
+      }
+      responses: {
+        /** @description add new group member. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to add new group member. May already exist. */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/groupmember/{groupId}/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete group members. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['GroupMemberUpdate']
+        }
+      }
+      responses: {
+        /** @description update a group member. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/albummember/{albumId}/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['AlbumMemberCreate']
+        }
+      }
+      responses: {
+        /** @description add new album member. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to add new album member. May already exist. */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete group members. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['GroupMemberUpdate']
+        }
+      }
+      responses: {
+        /** @description update a group member. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/albummember/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description get group members. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              dateAdded: string
+              AlbumId: string
+              Role: string
+              userId: string
+            }[]
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/publiclink/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description get group members. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              publicLink: string
+            }
+          }
+        }
+        /** @description could not find group */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description add new public link. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              publicLink: string
+            }
+          }
+        }
+        /** @description failed to create public link. May already exist. */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete public link */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['PublicLinkUpdate']
+        }
+      }
+      responses: {
+        /** @description update a public links status. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/user': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['UserCreate']
+        }
+      }
+      responses: {
+        /** @description create a new user object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              userId: string
+            }
+          }
+        }
+        /** @description failed to create new user. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/user/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch an image object. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              user: {
+                country: string
+                createdAt?: string | null
+                dateOfBirth: string
+                email: string
+                firstName: string
+                id: string
+                lastName: string
+                phone?: string | null
+                profileImage?: string | null
+                state: string
+                subscription: string
+              }
+            }
+          }
+        }
+        /** @description Image could not be found in bucket. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete a user by id. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to delete the image. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['UserUpdate']
+        }
+      }
+      responses: {
+        /** @description update a user object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to update user. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/album/all/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch all albums for a user. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              albumIds: string[]
+            }
+          }
+        }
+        /** @description albums could not be fetched. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/album': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['AlbumCreate']
+        }
+      }
+      responses: {
+        /** @description create a new album object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              albumId: string
+            }
+          }
+        }
+        /** @description failed to create new album. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/album/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch an album object. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              album: {
+                description: string
+                name: string
+                dateCreated: string
+                id: string
+                lastUpdated: string
+                numImages?: number | null
+                owner: string
+                thumbnailUrl: string
+              }
+            }
+          }
+        }
+        /** @description album could not be found. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete an album by id. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to delete the album. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['AlbumUpdate']
+        }
+      }
+      responses: {
+        /** @description update a user object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to update user. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/group': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['GroupCreate']
+        }
+      }
+      responses: {
+        /** @description create a new album object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              groupId: string
+            }
+          }
+        }
+        /** @description failed to create new album. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/group/{groupId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch an album object. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              group: {
+                description: string
+                name: string
+                dateCreated: string
+                id: string
+                lastUpdated: string
+                owner: string
+                emojiThumbnail: string
+              }
+            }
+          }
+        }
+        /** @description album could not be found. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description delete an group by id. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to delete the group. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: {
+        content: {
+          'multipart/form-data': components['schemas']['GroupUpdate']
+        }
+      }
+      responses: {
+        /** @description update a group. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to update group. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/group/all/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          userId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch all groups for a user. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              groups: {
+                description: string
+                name: string
+                dateCreated: string
+                id: string
+                lastUpdated: string
+                owner: string
+                emojiThumbnail: string
+                members: string[]
+              }[]
+            }
+          }
+        }
+        /** @description album could not be found. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/group/albums/{groupId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Fetch all groups for a user. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+              albums: {
+                description: string
+                name: string
+                dateCreated: string
+                id: string
+                lastUpdated: string
+                owner: string
+                numImages?: number | null
+                thumbnailUrl: string
+              }[]
+            }
+          }
+        }
+        /** @description album could not be found. */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/group/{groupId}/{albumId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description create a new album object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to create new album. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          groupId: string
+          albumId: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description create a new album object. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+        /** @description failed to create new album. */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              type: string
+              message: string
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
-    schemas: never;
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: {
+    ImageCreate: {
+      /** @example user1 */
+      ownerId: string
+      /** @example album1 */
+      albumId: string
+      /** @example A photo of a cow. Moo! */
+      description?: string
+      /** @example 1 */
+      order: number
+      /** @example 1080 */
+      widthPx: number
+      /** @example 1920 */
+      heightPx: number
+      image: string
+      mimeType: string
+    }
+    ImageUpdate: {
+      /** @example A photo of a cow. Moo! */
+      description?: string | null
+      /** @example 1 */
+      order?: number
+    }
+    CommentCreate: {
+      /** @example user1 */
+      ownerId: string
+      /** @example album1 */
+      albumId: string
+      /** @example Wow! such a beautiful pic! */
+      content: string
+    }
+    CommentDelete: {
+      /** @example user1 */
+      ownerId: string
+    }
+    GroupMemberCreate: {
+      /**
+       * @example CONTRIBUTOR
+       * @enum {string}
+       */
+      role?: 'OWNER' | 'CONTRIBUTOR' | 'VIEWER'
+      /** @example user1 */
+      userId?: string
+      /** @example 0400333333 */
+      phone?: string
+    }
+    GroupMemberUpdate: {
+      /**
+       * @example CONTRIBUTOR
+       * @enum {string}
+       */
+      role?: 'OWNER' | 'CONTRIBUTOR' | 'VIEWER'
+    }
+    AlbumMemberCreate: {
+      /**
+       * @example CONTRIBUTOR
+       * @enum {string}
+       */
+      role?: 'OWNER' | 'CONTRIBUTOR' | 'VIEWER'
+    }
+    PublicLinkUpdate: {
+      enabled: boolean
+    }
+    UserCreate: {
+      /** @example user1 */
+      id: string
+      /** @example John */
+      firstName: string
+      /** @example Doe */
+      lastName: string
+      /** @example 2000-01-07 */
+      dateOfBirth: string
+      /**
+       * Format: email
+       * @example john.doe@email.com
+       */
+      email: string
+      /** @example 0400500600 */
+      phone: string
+      /**
+       * Format: uri
+       * @example https://media.istockphoto.com/id/1327592506/vector/default-avatar-photo-placeholder-icon-grey-profile-picture-business-man.jpg?s=612x612&w=0&k=20&c=BpR0FVaEa5F24GIw7K8nMWiiGmbb8qmhfkpXcp1dhQg=
+       */
+      profileImage?: string
+      /** @example australia */
+      country: string
+      /** @example vic */
+      state: string
+    }
+    UserUpdate: {
+      /** @example https://someimage.com */
+      profileImage?: string
+    }
+    AlbumCreate: {
+      /** @example user1 */
+      ownerId: string
+      /** @example French Architecture */
+      name: string
+      /** @example a collection of the most beautiful examples of historic french architecture taken from our trip around all of france. */
+      description: string
+    }
+    AlbumUpdate: {
+      /** @example Babys first moments! */
+      name?: string
+      /** @example A collection of beautiful baby Andreas first experiences! */
+      description?: string
+    }
+    GroupCreate: {
+      /** @example user2 */
+      ownerId: string
+      /** @example 🎃 */
+      emojiThumbnail: string
+      /** @example Halloweenies */
+      name: string
+      /** @example The spoopiest group who ever did live. */
+      description: string
+    }
+    GroupUpdate: {
+      /** @example 🎎 */
+      emojiThumbnail?: string
+      /** @example The Doll House */
+      name?: string
+      /** @example Just the groups of girlies. */
+      description?: string
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export type $defs = Record<string, never>
+export type operations = Record<string, never>

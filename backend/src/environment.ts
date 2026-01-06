@@ -10,6 +10,7 @@ export type ENVS = {
   R2_SECRET_ACCESS_KEY: string
   BUCKET_NAME: string
   ACCOUNT_ID: string
+  R2_PUBLIC_BASE_URL: string
 }
 
 // export const ROLES = [

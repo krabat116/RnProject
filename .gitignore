@@ -1,4 +1,25 @@
+# dependencies
 node_modules/
+
+# build outputs
 dist/
 build/
+
+# env
 .env
+.env.*
+
+# Cloudflare / Wrangler
+wrangler.toml
+wrangler.json
+wrangler.jsonc
+.wrangler/
+
+# Expo
+.expo/
+.expo-shared/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
