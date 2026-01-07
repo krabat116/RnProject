@@ -19,6 +19,8 @@ import {
   TextInput,
   Pressable,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
   // Button,
 } from 'react-native'
 
@@ -76,6 +78,66 @@ const AlbumDetail = () => {
   const { bottom: bottomSafeArea } = useSafeAreaInsets()
   const imageOptionsModalRef = useRef<BottomSheetModal>(null)
   const commentsModalRef = useRef<BottomSheetModal>(null)
+  const editAlbumModalRef = useRef<BottomSheetModal>(null)
+  // Edit album name/description modal
+  const [draftAlbumName, setDraftAlbumName] = useState('')
+  const [draftAlbumDesc, setDraftAlbumDesc] = useState('')
+
+  const openEditAlbumModal = useCallback(() => {
+    // 모달 열 때 현재 앨범 값으로 초기화
+    setDraftAlbumName(selectedAlbum?.name ?? '')
+    setDraftAlbumDesc(selectedAlbum?.description ?? '')
+    editAlbumModalRef.current?.present()
+  }, [selectedAlbum])
+
+  const saveAlbumUpdate = useCallback(async () => {
+    try {
+      const name = draftAlbumName.trim()
+      const description = draftAlbumDesc.trim()
+
+      const form = new FormData()
+
+      // ✅ 바뀐 것만 보내기 (선택)
+      if (name !== (selectedAlbum?.name ?? '')) form.append('name', name)
+      if (description !== (selectedAlbum?.description ?? ''))
+        form.append('description', description)
+
+      // 아무 변경 없으면 그냥 닫기
+      // RN FormData 내부 구조가 환경마다 달라서 _parts 체크는 피하고, 간단히 비교로 처리
+      if (
+        name === (selectedAlbum?.name ?? '') &&
+        description === (selectedAlbum?.description ?? '')
+      ) {
+        editAlbumModalRef.current?.dismiss()
+        return
+      }
+
+      const { data, error } = await api.PATCH('/album/{albumId}' as any, {
+        params: { path: { albumId: albumIdString } },
+        body: {
+          name,
+          description,
+        },
+        //form에서 name,description으로 변경함
+        // 일부 환경에서 필요할 수 있어. 안되면 추가:
+        // headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      if (error) {
+        console.log('PATCH /album error:', error)
+        Alert.alert('Error', error.message ?? 'Failed to update album.')
+        return
+      }
+
+      editAlbumModalRef.current?.dismiss()
+
+      // ✅ 갱신: 서버에서 다시 가져오는 게 가장 안전
+      await fetchAlbumDetails()
+    } catch (e) {
+      console.error(e)
+      Alert.alert('Error', 'Failed to update album.')
+    }
+  }, [albumIdString, draftAlbumName, draftAlbumDesc, selectedAlbum])
 
   const createPhotoOptionsModal = useCallback(() => {
     imageOptionsModalRef.current?.present()
@@ -484,18 +546,20 @@ const AlbumDetail = () => {
 
   return (
     <View className="flex-1 p-4 bg-white ">
-      <View className="px-4 items-center justify-center">
-        <Text
-          className="text-5xl text-center w-5/6 tracking-wider"
-          style={{ fontFamily: 'Italiana_400Regular' }}
-        >
-          {selectedAlbum.name}
-        </Text>
-        <Text className="my-4 text-base text-center text-gray-600 ">
-          {selectedAlbum.description}
-        </Text>
-      </View>
+      <Pressable onLongPress={openEditAlbumModal} delayLongPress={500}>
+        <View className="px-4 items-center justify-center">
+          <Text
+            className="text-5xl text-center w-5/6 tracking-wider"
+            style={{ fontFamily: 'Italiana_400Regular' }}
+          >
+            {selectedAlbum.name}
+          </Text>
 
+          <Text className="my-4 text-base text-center text-gray-600 ">
+            {selectedAlbum.description}
+          </Text>
+        </View>
+      </Pressable>
       <TouchableOpacity className="w-full items-end" onPress={takePhoto}>
         <Text className="text-md text-gray-400 m-3 flex items-end">
           +Add Photo
@@ -537,7 +601,51 @@ const AlbumDetail = () => {
           <CommentSection />
         </BottomSheetView>
       </BottomSheetModal>
+      <BottomSheetModal
+        ref={editAlbumModalRef}
+        index={0}
+        snapPoints={['55%']}
+        style={{ shadowRadius: 6, shadowColor: '#000', shadowOpacity: 0.15 }}
+      >
+        <BottomSheetView style={contentContainerStyle}>
+          <TouchableWithoutFeedback
+            onPress={Keyboard.dismiss}
+            accessible={false}
+          >
+            <View style={{ flex: 1 }}>
+              <Text
+                className="mb-8 text-4xl font-bold tracking-wider"
+                style={{ fontFamily: 'Italiana_400Regular' }}
+              >
+                Edit Album
+              </Text>
 
+              <TextInput
+                style={{ fontFamily: 'Nunito_400Regular' }}
+                className="bg-white border-gray-200 border-solid border-2 p-4 mb-4 rounded-lg w-full"
+                placeholder="Album Title"
+                placeholderTextColor="#6b7280"
+                autoCapitalize="none"
+                value={draftAlbumName}
+                onChangeText={setDraftAlbumName}
+              />
+
+              <TextInput
+                style={{ fontFamily: 'Nunito_400Regular' }}
+                className="bg-white border-gray-200 border-solid border-2 p-4 mb-4 rounded-lg w-full"
+                placeholder="Album Description"
+                placeholderTextColor="#6b7280"
+                autoCapitalize="none"
+                multiline
+                value={draftAlbumDesc}
+                onChangeText={setDraftAlbumDesc}
+              />
+
+              <Button title="Save" onPress={saveAlbumUpdate} />
+            </View>
+          </TouchableWithoutFeedback>
+        </BottomSheetView>
+      </BottomSheetModal>
       <TouchableOpacity
         className="w-full items-end"
         onPress={createCommentsModal}

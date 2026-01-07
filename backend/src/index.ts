@@ -4,6 +4,7 @@ import { swaggerUI } from '@hono/swagger-ui'
 import { createAlbum } from './features/album/createAlbum'
 import { getAllAlbums } from './features/album/getAllAlbums'
 import { getAlbum } from './features/album/getAlbum'
+import { updateAlbum } from './features/album/updateAlbum'
 import { deleteAlbum } from './features/album/deleteAlbum'
 
 import { getImage } from './features/image/getImage'
@@ -28,6 +29,7 @@ app.route('/', getAllAlbums)
 app.route('/', getAlbum)
 app.route('/', createAlbum)
 app.route('/', deleteAlbum)
+app.route('/', updateAlbum)
 
 app.route('/', getImage)
 app.route('/', getAllImages)

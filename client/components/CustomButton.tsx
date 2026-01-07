@@ -7,10 +7,10 @@ export default function Button(props: {
   const { onPress, title = 'Save' } = props
   return (
     <Pressable
-      className="bg-black items-center justify-center py-3 rounded-lg"
+      className="h-12 bg-black items-center justify-center py-3 rounded-lg"
       onPress={onPress}
     >
-      <Text className="font-bold text-stone-50 text-lg tracking-wider">
+      <Text className="font-bold text-white text-lg tracking-wider">
         {title}
       </Text>
     </Pressable>
