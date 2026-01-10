@@ -11,10 +11,8 @@ This project was built as a portfolio project to demonstrate real-world frontend
 
 ## Features
 
-- User authentication and session-based access
 - Create and manage groups
 - Update group information (name, description, emoji thumbnail)
-- Invite members to groups via phone number
 - Create albums and attach them to groups
 - Upload and view images within albums
 - Long-press album actions (remove album from group)
