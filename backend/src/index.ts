@@ -7,6 +7,10 @@ import { getAlbum } from './features/album/getAlbum'
 import { updateAlbum } from './features/album/updateAlbum'
 import { deleteAlbum } from './features/album/deleteAlbum'
 
+import { createComment } from './features/comment/createComment'
+import { getComments } from './features/comment/getComments'
+import { deleteComment } from './features/comment/deleteComment'
+
 import { getImage } from './features/image/getImage'
 import { getAllImages } from './features/image/getAllImages'
 import { uploadImage } from './features/image/uploadImage'
@@ -36,6 +40,10 @@ app.route('/', getAllImages)
 app.route('/', uploadImage)
 app.route('/', updateImage)
 app.route('/', deleteImage)
+
+app.route('/', createComment)
+app.route('/', getComments)
+app.route('/', deleteComment)
 
 app.route('', createGroup)
 app.route('', getGroup)

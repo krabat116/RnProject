@@ -16,6 +16,7 @@ import {
   TouchableHighlight,
   StyleSheet,
   TextInput,
+  Alert,
 } from 'react-native'
 import { Link, useLocalSearchParams } from 'expo-router'
 import { useFonts, Italiana_400Regular } from '@expo-google-fonts/italiana'
@@ -59,7 +60,11 @@ const GroupDetail = () => {
   const groupAlbumOptionsModalRef = useRef<BottomSheetModal>(null)
   const addAlbumModalRef = useRef<BottomSheetModal>(null)
   const membersModalRef = useRef<BottomSheetModal>(null)
+  const editGroupModalRef = useRef<BottomSheetModal>(null)
 
+  const createEditGroupModal = useCallback(() => {
+    editGroupModalRef.current?.present()
+  }, [])
   const createAlbumOptionsModal = useCallback(() => {
     groupAlbumOptionsModalRef.current?.present()
   }, [])
@@ -535,6 +540,102 @@ const GroupDetail = () => {
     )
   }
 
+  const EditGroupForm = () => {
+    const [isError, setIsError] = useState(false)
+
+    const [emojiThumbnail, setEmojiThumbnail] = useState(
+      groupData.emojiThumbnail ?? ''
+    )
+    const [name, setName] = useState(groupData.name ?? '')
+    const [description, setDescription] = useState(groupData.description ?? '')
+
+    useEffect(() => {
+      setEmojiThumbnail(groupData.emojiThumbnail ?? '')
+      setName(groupData.name ?? '')
+      setDescription(groupData.description ?? '')
+    }, [groupData])
+
+    const updateGroup = async () => {
+      try {
+        setIsError(false)
+
+        if (!name.trim()) {
+          Alert.alert('Validation', 'Group name is required.')
+          return
+        }
+
+        // ✅ multipart/form-data 만들기
+        const form = new FormData()
+
+        // 백엔드가 optional이라서, "값이 있을 때만" 넣는 게 안전
+        const trimmedName = name.trim()
+        const trimmedDesc = description.trim()
+        const trimmedEmoji = emojiThumbnail.trim()
+
+        if (trimmedName.length > 0) form.append('name', trimmedName)
+        if (trimmedDesc.length > 0) form.append('description', trimmedDesc)
+        if (trimmedEmoji.length > 0) form.append('emojiThumbnail', trimmedEmoji)
+
+        const { error } = await api.PATCH('/group/{groupId}' as any, {
+          params: { path: { groupId: groupIdString } },
+          // ✅ multipart/form-data
+          body: form as any,
+          // 일부 환경에서 필요할 수 있어. (너가 앨범에서 코멘트해둔 것처럼)
+          // headers: { 'Content-Type': 'multipart/form-data' },
+        })
+
+        if (error) {
+          setIsError(true)
+          Alert.alert('Error', error.message ?? 'Failed to update group.')
+          return
+        }
+
+        editGroupModalRef.current?.dismiss()
+        await fetchGroup() // ✅ 서버에서 다시 가져오기
+      } catch (e) {
+        console.error(e)
+        setIsError(true)
+        Alert.alert('Error', 'Failed to update group.')
+      }
+    }
+
+    return (
+      <View>
+        {/* emojiThumbnail */}
+        <Text className="mb-2 text-base text-gray-600">Emoji Thumbnail</Text>
+        <TextInput
+          className="bg-white border-gray-200 border-solid border-2 p-4 mb-4 rounded-lg w-full"
+          value={emojiThumbnail}
+          onChangeText={setEmojiThumbnail}
+          placeholder="🎎"
+          maxLength={2} // 보통 이모지 1개지만 유니코드 때문에 2 정도로 안전
+        />
+
+        {/* name */}
+        <Text className="mb-2 text-base text-gray-600">Group Name</Text>
+        <TextInput
+          className="bg-white border-gray-200 border-solid border-2 p-4 mb-4 rounded-lg w-full"
+          value={name}
+          onChangeText={setName}
+          placeholder="The Doll House"
+        />
+
+        {/* description */}
+        <Text className="mb-2 text-base text-gray-600">Description</Text>
+        <TextInput
+          className="bg-white border-gray-200 border-solid border-2 p-4 mb-4 rounded-lg w-full"
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Just the groups of girlies."
+          multiline
+        />
+
+        <Button title="Save" onPress={updateGroup} />
+        {isError && <ErrorCard />}
+      </View>
+    )
+  }
+
   const AddMemberButton = () => {
     return (
       <TouchableHighlight
@@ -548,10 +649,42 @@ const GroupDetail = () => {
     )
   }
 
+  const EditGroupButton = () => {
+    return (
+      <TouchableHighlight
+        className="justify-center rounded-full aspect-square align-middle"
+        activeOpacity={0.1}
+        underlayColor="#DDDDDD"
+        onPress={createEditGroupModal}
+      >
+        <Ionicons name="create-outline" size={32} />
+      </TouchableHighlight>
+    )
+  }
+
   return (
     <View className="flex-1 p-4 bg-white ">
+      <BottomSheetModal
+        ref={editGroupModalRef}
+        index={0}
+        snapPoints={['60%']}
+        style={{ shadowRadius: 6, shadowColor: '#000', shadowOpacity: 0.15 }}
+      >
+        <BottomSheetView style={contentContainerStyle}>
+          <Text
+            className="mb-8 text-4xl font-bold tracking-wider"
+            style={{ fontFamily: 'Italiana_400Regular' }}
+          >
+            Edit Group
+          </Text>
+
+          <EditGroupForm />
+        </BottomSheetView>
+      </BottomSheetModal>
+
       <View className="flex flex-row mb-6">
         <View className="flex-grow" />
+        <EditGroupButton />
         <AddMemberButton />
         <AddAlbumButton />
       </View>
@@ -618,6 +751,23 @@ const GroupDetail = () => {
             Members
           </Text>
           <GroupMembers />
+        </BottomSheetView>
+      </BottomSheetModal>
+      <BottomSheetModal
+        ref={editGroupModalRef}
+        index={0}
+        snapPoints={['60%']}
+        style={{ shadowRadius: 6, shadowColor: '#000', shadowOpacity: 0.15 }}
+      >
+        <BottomSheetView style={contentContainerStyle}>
+          <Text
+            className="mb-8 text-4xl font-bold tracking-wider"
+            style={{ fontFamily: 'Italiana_400Regular' }}
+          >
+            Edit Group
+          </Text>
+
+          <EditGroupForm />
         </BottomSheetView>
       </BottomSheetModal>
     </View>
