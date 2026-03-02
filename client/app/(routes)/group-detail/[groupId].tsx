@@ -101,21 +101,26 @@ const GroupDetail = () => {
 
   const fetchImages = async (albumId: string) => {
     try {
-      const { data, error } = await api.GET('/image/all/{albumId}', {
+      const { data, error, response } = await api.GET('/image/all/{albumId}', {
         params: { path: { albumId } },
       })
 
-      console.log(data)
+      // console.log('image api status:', response?.status)
+      // console.log('image api data type:', typeof data, Array.isArray(data))
+      // console.log('image api data:', JSON.stringify(data, null, 2))
 
-      if (error) {
-        return []
-      }
+      if (error || !data) return []
 
-      return (data || []).slice(0, 4).map((image: any) => ({
+      const list = Array.isArray(data)
+        ? data
+        : (data as any).images ?? (data as any).data ?? []
+
+      return (list as any[]).slice(0, 4).map((image: any) => ({
         id: image.id,
-        url: image.imageUrl,
+        url: image.thumbnailUrl ?? image.imageUrl,
       }))
     } catch (err) {
+      console.log('fetchImages error:', err)
       return []
     }
   }

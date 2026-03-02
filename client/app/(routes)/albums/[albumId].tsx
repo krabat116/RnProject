@@ -454,22 +454,45 @@ const AlbumDetail = () => {
     )
   }
 
-  const CommentListItem: FC<{ comment: Comment }> = ({ comment }) => {
+  const CommentListItem: FC<{
+    comment: Comment
+    isOwner: boolean
+    onDelete: (id: string) => void
+  }> = ({ comment, isOwner, onDelete }) => {
+    const confirmDelete = () => {
+      if (!isOwner) return
+
+      Alert.alert(
+        'Delete comment?',
+        'This comment will be permanently deleted.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => onDelete(comment.id),
+          },
+        ]
+      )
+    }
+
     return (
-      <View className="flex flex-row w-full my-3">
-        {comment.profileImage && (
-          <Image
-            className="m-1 w-12 h-12 rounded-full"
-            source={{ uri: comment.profileImage }}
-          />
-        )}
-        <View className="ml-2 flex flex-col justify-center">
-          <Text className="text-sm">
-            {comment.firstName} {comment.lastName}
-          </Text>
-          <Text className="text-lg">{comment.content}</Text>
+      <Pressable onLongPress={confirmDelete}>
+        <View className="flex flex-row w-full my-3">
+          {comment.profileImage && (
+            <Image
+              className="m-1 w-12 h-12 rounded-full"
+              source={{ uri: comment.profileImage }}
+            />
+          )}
+          <View className="ml-2 flex flex-col justify-center">
+            <Text className="text-sm">
+              {comment.firstName} {comment.lastName}
+            </Text>
+            <Text className="text-lg">{comment.content}</Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
     )
   }
 
@@ -491,6 +514,25 @@ const AlbumDetail = () => {
         return
       }
       setComments(data.comments)
+    }
+
+    const deleteComment = async (commentId: string) => {
+      const { error, response } = await api.DELETE(
+        '/comment/{commentId}' as any,
+        {
+          params: { path: { commentId } },
+          body: { ownerId: userId },
+        }
+      )
+      console.log('delete comment status:', response?.status)
+      if (error) {
+        console.log('delete comment error:', error)
+        Alert.alert('Error', error.message ?? 'Failed to delete comment.')
+        return
+      }
+
+      // ✅ 즉시 UI 반영
+      setComments((prev) => prev.filter((c) => c.id !== commentId))
     }
 
     const addComment = async () => {
@@ -535,7 +577,11 @@ const AlbumDetail = () => {
           numColumns={1}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <CommentListItem key={item.id} comment={item} />
+            <CommentListItem
+              comment={item}
+              isOwner={item.owner === userId}
+              onDelete={deleteComment}
+            />
           )}
           contentContainerStyle={{ paddingBottom: 16 }}
         />

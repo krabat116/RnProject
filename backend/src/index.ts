@@ -17,6 +17,11 @@ import { uploadImage } from './features/image/uploadImage'
 import { updateImage } from './features/image/updateImage'
 import { deleteImage } from './features/image/deleteImage'
 
+import { createGroupMember } from './features/groupmember/createGroupMember'
+import { getGroupMembers } from './features/groupmember/getGroupMembers'
+import { deleteGroupMember } from './features/groupmember/deleteGroupMember'
+import { updateGroupMember } from './features/groupmember/updateGroupMember'
+
 import { createGroup } from './features/group/createGroup'
 import { getGroup } from './features/group/getGroup'
 import { updateGroup } from './features/group/updateGroup'
@@ -53,6 +58,11 @@ app.route('', getUserGroups)
 app.route('', getGroupAlbums)
 app.route('', createGroupAlbum)
 app.route('', removeGroupAlbum)
+
+app.route('/', createGroupMember)
+app.route('/', getGroupMembers)
+app.route('/', deleteGroupMember)
+app.route('/', updateGroupMember)
 
 // Swagger UI
 app.get('/ui', swaggerUI({ url: '/doc' }))

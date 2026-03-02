@@ -21,6 +21,8 @@ import Button, { DestructiveButton } from '@/components/CustomButton'
 import ErrorCard from '@/components/ErrorCard'
 import { GestureDetector, Gesture } from 'react-native-gesture-handler'
 import { useUserSession } from '@/components/contexts/sessionContext'
+import { runOnJS } from 'react-native-reanimated'
+import { Alert } from 'react-native'
 
 type Group = {
   description: string
@@ -123,12 +125,46 @@ export default function App() {
   }
 
   // Component to render each group in the FlatList
+
   const GroupItem: FC<{ group: Group }> = ({ group }) => {
-    const callback = () => {
-      setSelectedGroup(group)
-      createActionsModal()
-    }
-    const gesture = Gesture.LongPress().onStart(callback)
+    const confirmDeleteFromLongPress = useCallback(() => {
+      // owner만 삭제 가능하게 하고 싶으면 여기서 체크
+      // if (group.owner !== userId) return;
+
+      Alert.alert(
+        'Delete group?',
+        `"${group.name}" will be deleted.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              const { error } = await api.DELETE('/group/{groupId}', {
+                params: { path: { groupId: group.id } },
+              })
+              if (error) {
+                Alert.alert('Error', 'Failed to delete group.')
+                return
+              }
+              fetchGroups()
+            },
+          },
+        ],
+        { cancelable: true }
+      )
+    }, [group, fetchGroups])
+
+    const gesture = useMemo(
+      () =>
+        Gesture.LongPress()
+          .minDuration(400)
+          .onStart(() => {
+            runOnJS(confirmDeleteFromLongPress)()
+          }),
+      [confirmDeleteFromLongPress]
+    )
+
     return (
       <GestureDetector gesture={gesture}>
         <View className="mb-6 w-1/2">
@@ -182,58 +218,149 @@ export default function App() {
       </TouchableHighlight>
     )
   }
-
   const GroupActions = () => {
     const [isError, setIsError] = useState(false)
 
     const deleteSelectedGroup = async () => {
-      const { data, error } = await api.DELETE('/group/{groupId}', {
-        params: { path: { groupId: selectedGroup?.id || '' } },
+      if (!selectedGroup?.id) return
+
+      const { error } = await api.DELETE('/group/{groupId}', {
+        params: { path: { groupId: selectedGroup.id } },
       })
 
-      if (error) setIsError(true)
+      if (error) {
+        setIsError(true)
+        return
+      }
+
       actionsModalRef.current?.dismiss()
       fetchGroups()
     }
 
     const leaveSelectedGroup = async () => {
-      const { data, error } = await api.DELETE(
-        '/groupmember/{groupId}/{userId}',
-        {
-          params: {
-            path: {
-              groupId: selectedGroup?.id || '',
-              userId: userId || '',
-            },
-          },
-        }
-      )
+      if (!selectedGroup?.id || !userId) return
 
-      if (error) setIsError(true)
+      const { error } = await api.DELETE('/groupmember/{groupId}/{userId}', {
+        params: {
+          path: {
+            groupId: selectedGroup.id,
+            userId,
+          },
+        },
+      })
+
+      if (error) {
+        setIsError(true)
+        return
+      }
+
       actionsModalRef.current?.dismiss()
       fetchGroups()
     }
 
-    const isOwner = selectedGroup?.owner == userId
+    const confirmDeleteGroup = () => {
+      if (!selectedGroup?.name) return
+      setIsError(false)
+
+      Alert.alert(
+        'Delete group?',
+        `"${selectedGroup.name}" will be deleted.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: deleteSelectedGroup,
+          },
+        ],
+        { cancelable: true }
+      )
+    }
+
+    const confirmLeaveGroup = () => {
+      if (!selectedGroup?.name) return
+      setIsError(false)
+
+      Alert.alert(
+        'Leave group?',
+        `You will leave "${selectedGroup.name}".`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Leave', style: 'destructive', onPress: leaveSelectedGroup },
+        ],
+        { cancelable: true }
+      )
+    }
+
+    const isOwner = selectedGroup?.owner === userId
 
     return (
       <View>
-        {isOwner && (
+        {isOwner ? (
           <DestructiveButton
             title="Delete Group"
-            onPress={deleteSelectedGroup}
-          ></DestructiveButton>
+            onPress={confirmDeleteGroup}
+          />
+        ) : (
+          <DestructiveButton title="Leave Group" onPress={confirmLeaveGroup} />
         )}
-        {!isOwner && (
-          <DestructiveButton
-            title="Leave Group"
-            onPress={leaveSelectedGroup}
-          ></DestructiveButton>
-        )}
+
         {isError && <ErrorCard />}
       </View>
     )
   }
+
+  // const GroupActions = () => {
+  //   const [isError, setIsError] = useState(false)
+
+  //   const deleteSelectedGroup = async () => {
+  //     const { data, error } = await api.DELETE('/group/{groupId}', {
+  //       params: { path: { groupId: selectedGroup?.id || '' } },
+  //     })
+
+  //     if (error) setIsError(true)
+  //     actionsModalRef.current?.dismiss()
+  //     fetchGroups()
+  //   }
+
+  //   const leaveSelectedGroup = async () => {
+  //     const { data, error } = await api.DELETE(
+  //       '/groupmember/{groupId}/{userId}',
+  //       {
+  //         params: {
+  //           path: {
+  //             groupId: selectedGroup?.id || '',
+  //             userId: userId || '',
+  //           },
+  //         },
+  //       }
+  //     )
+
+  //     if (error) setIsError(true)
+  //     actionsModalRef.current?.dismiss()
+  //     fetchGroups()
+  //   }
+
+  //   const isOwner = selectedGroup?.owner == userId
+
+  //   return (
+  //     <View>
+  //       {isOwner && (
+  //         <DestructiveButton
+  //           title="Delete Group"
+  //           onPress={deleteSelectedGroup}
+  //         ></DestructiveButton>
+  //       )}
+  //       {!isOwner && (
+  //         <DestructiveButton
+  //           title="Leave Group"
+  //           onPress={leaveSelectedGroup}
+  //         ></DestructiveButton>
+  //       )}
+  //       {isError && <ErrorCard />}
+  //     </View>
+  //   )
+  // }
 
   const CreateGroupForm = () => {
     const [newGroupName, setNewGroupName] = useState<string>('')
